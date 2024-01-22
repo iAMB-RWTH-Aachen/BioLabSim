@@ -1,13 +1,13 @@
 silvio
 biopython~=1.79
-#cobra~=0.22
+cobra==0.17
 #Escher~=1.7
 IPython==7.20
 joblib>=0.14
 matplotlib==3.1
 numpy==1.22
 openpyxl~=3.0
-pandas>=1.0
+pandas==1.5.0
 recordclass
 charset-normalizer~=2.0
 scikit-learn>=1.0

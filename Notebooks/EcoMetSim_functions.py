@@ -15,9 +15,19 @@ def load_model():
     returns:
     model: cobra model
     '''
-    ModelFile = os.path.join('..', '53_Models', 'e_coli_core.xml.gz')
-    if os.path.isfile(ModelFile):
-        print(f'Loading existing file e_coli_core.xml.gz')
+    # define boths paths where the model can be stored
+    ModelFiles = [
+        os.path.join('..', '53_Models', 'e_coli_core.xml.gz'),
+        os.path.join('..', 'models', 'e_coli_core.xml.gz')
+    ]
+    model = None
+
+    # load the model from the first path where it is found
+    for ModelFile in ModelFiles:
+        if os.path.isfile(ModelFile):
+            print(f'Loading existing file e_coli_core.xml.gz')
+            model = read_sbml_model(ModelFile)
+            return model
     else:
         print('Download of file e_coli_core.xml.gz from BIGG')
         # download the file from BIGG and save it in the `Data` directory
@@ -80,13 +90,10 @@ def get_sub_pro_pair(model, metabolites):
     returns:
     tuple: pair of metabolite IDs (met_id1, met_id2) that fulfill the conditions
     '''
-
-    # Select a random pair of metabolites from the valid_metabolites
-    
+    # Select a random pair of metabolites from metabolites
     search_pair = True
     while search_pair:
         selected_pair = random.sample(metabolites, 2)
-        # print(selected_pair)
         # new pair if amount of carbon is the same
         same_id = model.metabolites.get_by_id(selected_pair[0]).formula != model.metabolites.get_by_id(selected_pair[1]).formula
         # pair with more than 1 Carbon
@@ -140,7 +147,6 @@ def make_metabolite_combination(Student_ID):
     product_lim: float, limited product flux
     rct: 
     '''
-    
     random.seed(Student_ID)
     model = load_model()
     metabolites = get_metabolites(model)
@@ -148,13 +154,13 @@ def make_metabolite_combination(Student_ID):
     # variable with max product flux
     product = round(check_product(model, selected_pair[0], selected_pair[1]),2)
     # divide product_max by itself to get 1
-    product_max = round(check_product(model, selected_pair[0], selected_pair[1]),2) / product
+    product_max = product / product
     model, rct = limit_Rct(model, selected_pair)
     # divide new product rate by product to get a value between 0 and 1
-    product_lim = round(model.slim_optimize(),2) / product
-    all_reactions = [f'{selected_pair[0]} --> {selected_pair[1]}', f'{selected_pair[0]} --> {selected_pair[1]} limited']
-    product_min = [product_max, product_lim]
-    return model, selected_pair, all_reactions, product, product_min, rct
+    product_lim = [round(model.slim_optimize(),2) / product]
+    all_reactions = [f'{selected_pair[0]} --> {selected_pair[1]} limited']
+    # product_min = [product_lim]
+    return model, selected_pair, all_reactions, product, product_lim, rct
 
 # function to set limited reaction back to original upper bounds in steps by factor 1.5
 # beliebig oft durchführbar und wird immer um faktor 1.5 hochgesetzt
@@ -173,7 +179,7 @@ def optimize_reaction(model, rct_id, increase_factor = 1.5):
     return model
 
 # function to create bar chart of substrate-product pair and associated product flux    
-def create_bar_chart(all_reactions, product_min): # target_reaction):
+def create_bar_chart(all_reactions, product_lim): # target_reaction):
     '''
     This function creates a bar chart of product flux
     args: 
@@ -184,9 +190,9 @@ def create_bar_chart(all_reactions, product_min): # target_reaction):
     bar chart
     '''
     idx = range(len(all_reactions))
-    plt.bar(idx, product_min)
+    plt.bar(idx, product_lim)
     plt.title('Product Flux for Substrate-Product Pair')
     plt.xlabel('Substrate-Product Combination')
     plt.ylabel('Product Flux [mmol/gDW/h]')
-    plt.xticks(idx, all_reactions)
+    plt.xticks(idx, all_reactions, rotation=90)
     plt.show()

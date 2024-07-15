@@ -95,13 +95,13 @@ def get_sub_pro_pair(model, metabolites):
     while search_pair:
         selected_pair = random.sample(metabolites, 2)
         # new pair if amount of carbon is the same
-        same_id = model.metabolites.get_by_id(selected_pair[0]).formula != model.metabolites.get_by_id(selected_pair[1]).formula
+        diff_id = model.metabolites.get_by_id(selected_pair[0]).formula != model.metabolites.get_by_id(selected_pair[1]).formula
         # pair with more than 1 Carbon
         more_C = np.min([model.metabolites.get_by_id(selected_pair[0]).elements['C'], model.metabolites.get_by_id(selected_pair[1]).elements['C']]) > 1
         # check if product flux is positive
         product_bool = check_product(model, selected_pair[0], selected_pair[1]) > 0
         # search pair False, if all conditions are met
-        if same_id and more_C and product_bool:
+        if diff_id and more_C and product_bool:
             search_pair = False
         return selected_pair 
     else:
@@ -128,9 +128,14 @@ def limit_Rct(model, selected_pair, multiplier = 0.5):
     model.objective = my_Rct[1]
     solution = model.optimize()
     Rct = np.where(abs(round(solution.fluxes)) >= round(solution.objective_value))[0]
-    rct = random.choice(Rct)
+    EX_idx = [index for index, reaction in enumerate(model.reactions) if 'EX_' in reaction.id]
+    valid_rct = list(set(Rct) - set(EX_idx))
+    rct = random.choice(valid_rct)
     rct_id = model.reactions[rct].id
-    model.reactions[rct].upper_bound = multiplier*solution.objective_value
+    if solution.fluxes[rct] > 0:
+        model.reactions[rct].upper_bound = multiplier*solution.fluxes[rct]
+    else:
+        model.reactions[rct].lower_bound = multiplier*solution.fluxes[rct]
     return model, rct_id
 
 # function to combine the functions above
@@ -175,7 +180,13 @@ def optimize_reaction(model, rct_id, increase_factor = 1.5):
     returns: 
     model: cobra model with bounds set back
     '''
-    model.reactions.get_by_id(rct_id).upper_bound = model.reactions.get_by_id(rct_id).upper_bound * increase_factor
+    solution = model.optimize()
+    # increase upper bound 
+    if solution.fluxes[model.reactions.get_by_id(rct_id).id] > 0:
+        model.reactions.get_by_id(rct_id).upper_bound = model.reactions.get_by_id(rct_id).upper_bound * increase_factor
+    # relax lower bound 
+    else:
+        model.reactions.get_by_id(rct_id).lower_bound = model.reactions.get_by_id(rct_id).lower_bound * increase_factor
     return model
 
 # function to create bar chart of substrate-product pair and associated product flux    

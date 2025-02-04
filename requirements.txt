@@ -1,25 +1,20 @@
-silvio
-biopython~=1.79
-cobra #==0.17
-#Escher~=1.7
-IPython==7.20
-joblib>=0.14
-matplotlib #==3.1
-plotly
-numpy #==1.23 #22
-openpyxl #~=3.0
-pandas #==1.5.0
-recordclass
-charset-normalizer~=2.0
-scikit-learn==1.2.2
-scipy #~=1.9
-#sphinx-rtd-theme~=0.5
-#Sphinx~=3.4
-watermark #~=2.0
-#zipfile
-#iambcodes
-# biomotifsim
-# jupyter_bokeh~=3.1.1
-bokeh~=3.1.1
 biocircuits==0.1.11
+biopython==1.79
+cobra==0.29.0
+#idna==3.3
+#Jinja2==3.0.3
+#joblib==1.4.2
+matplotlib==3.5.1
+numpy==1.23.5
+openpyxl==3.0.9
+pandas==2.2.2
+#pydna==5.2.0
+#recordclass==0.17.2
+setuptools
+scikit-learn==1.2.2
+scipy==1.9.3
+silvio
+#sklearn==0.0
+#watermark==2.3.0
 wget==3.2
+#xlrd==2.0.1

@@ -6,14 +6,14 @@ cobra==0.29.0
 #joblib==1.4.2
 matplotlib==3.5.1
 numpy==1.23.5
-openpyxl==3.0.9
+openpyxl==3.1.0
 pandas==2.2.2
 #pydna==5.2.0
 #recordclass==0.17.2
 setuptools
 scikit-learn==1.2.2
 scipy==1.9.3
-silvio
+silvio==0.2.11
 #sklearn==0.0
 #watermark==2.3.0
 wget==3.2

@@ -14,6 +14,8 @@ setuptools
 scikit-learn==1.2.2
 scipy==1.9.3
 silvio==0.2.11
+plotly==6.0.0
+nbformat==5.10.4
 #sklearn==0.0
 #watermark==2.3.0
 wget==3.2

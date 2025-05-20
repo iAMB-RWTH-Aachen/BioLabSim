@@ -13,6 +13,7 @@ GitHub_Token.txt
 Historic/*
 Data/*.xlsx
 Data/*.csv
+Data/*.zip
 _build
 
 
